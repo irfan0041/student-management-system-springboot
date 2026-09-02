@@ -1,13 +1,13 @@
 # Build stage
-
-FROM openjdk:21-jdk-slim
-
+FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
-
 COPY . .
+RUN mvn clean package -DskipTests
 
-RUN ./mvnw clean package -DskipTests
-
+# Run stage
+FROM eclipse-temurin:21-jre
+WORKDIR /app
+# Exact name-ku badhula *.jar use pannyurukom
+COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
-
-CMD ["java", "-jar", "target/studentmanagement-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
